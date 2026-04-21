@@ -5,15 +5,15 @@ const cors = require('cors');
 const Groq = require('groq-sdk');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const path = require('path');
-
-const app = express();
-const PORT = process.env.PORT || 3000;
 const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_KEY
 );
+const app = express();
+const PORT = process.env.PORT || 3000;
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -124,7 +124,7 @@ app.post('/api/chat', async (req, res) => {
 
             try {
                 // Convert messages to Gemini format (join content with newlines)
-                const geminiPrompt = messages.map(m => m.content).join('\n');
+                const geminiPrompt = systemPrompt + "\n" + messages.map(m => m.content).join('\n');
                 
                 const geminiModel = gemini.getGenerativeModel({ model: 'gemini-1.5-flash' });
                 const geminiResult = await geminiModel.generateContent(geminiPrompt);
@@ -136,7 +136,23 @@ app.post('/api/chat', async (req, res) => {
                 return res.status(500).json({ error: 'Both Groq and Gemini APIs failed' });
             }
         }
-        
+       try {
+    const userMessage = messages[messages.length - 1]?.content;
+
+    const { error } = await supabase.from('messages').insert([
+    {
+        user_text: userMessage,
+        ai_text: response
+    }
+]);
+
+if (error) {
+    console.error('Supabase insert error:', error.message);
+}
+    console.log('Message saved to Supabase');
+} catch (err) {
+    console.error('Supabase error:', err.message);
+} 
         res.json({ response });
     } catch (error) {
         console.error('Error in /api/chat:');
