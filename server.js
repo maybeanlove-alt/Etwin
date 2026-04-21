@@ -8,7 +8,12 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const { createClient } = require('@supabase/supabase-js');
 
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
 // Middleware
 app.use(cors());
 app.use(express.json());
