@@ -5,6 +5,7 @@ const cors = require('cors');
 const Groq = require('groq-sdk');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const path = require('path');
+const https = require('https');
 const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
@@ -191,7 +192,21 @@ if (error) {
     }
 });
 
+// Self-ping function to keep Render awake
+function selfPing() {
+    const url = 'https://etwin.onrender.com';
+    https.get(url, (res) => {
+        console.log(`Self-ping successful: ${res.statusCode}`);
+    }).on('error', (err) => {
+        console.error(`Self-ping failed: ${err.message}`);
+    });
+}
+
 // Start server
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
+    
+    // Start self-ping every 10 minutes (600000 ms)
+    selfPing();
+    setInterval(selfPing, 600000);
 });
