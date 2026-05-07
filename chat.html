@@ -136,6 +136,17 @@
             </div>
         </div>
     </div>
+    <!-- Confirmation Dialog -->
+    <div class="confirm-dialog-overlay" id="confirmDialogOverlay">
+        <div class="confirm-dialog">
+            <div class="confirm-dialog-title" id="confirmDialogTitle"></div>
+            <div class="confirm-dialog-message" id="confirmDialogMessage"></div>
+            <div class="confirm-dialog-buttons">
+                <button class="confirm-dialog-btn confirm-dialog-no" id="confirmDialogNo"></button>
+                <button class="confirm-dialog-btn confirm-dialog-yes" id="confirmDialogYes"></button>
+            </div>
+        </div>
+    </div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => { updateUILanguage(); }, 100);
@@ -879,17 +890,7 @@ hedefleyen yenilikçi bir öğrenci projesidir.
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js').then(() => console.log('Service Worker registered')).catch(err => console.log('Service Worker registration failed:', err));
         }
+        
     </script>
-    <!-- Confirmation Dialog -->
-    <div class="confirm-dialog-overlay" id="confirmDialogOverlay">
-        <div class="confirm-dialog">
-            <div class="confirm-dialog-title" id="confirmDialogTitle"></div>
-            <div class="confirm-dialog-message" id="confirmDialogMessage"></div>
-            <div class="confirm-dialog-buttons">
-                <button class="confirm-dialog-btn confirm-dialog-no" id="confirmDialogNo"></button>
-                <button class="confirm-dialog-btn confirm-dialog-yes" id="confirmDialogYes"></button>
-            </div>
-        </div>
-    </div>
 </body>
 </html>
