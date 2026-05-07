@@ -61,6 +61,10 @@
                     <span class="lang-tr">TR</span>
                     <span class="lang-en">EN</span>
                 </button>
+                <button class="clear-button" id="clearButton">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                    <span id="clearText"></span>
+                </button>
                 <div class="landing-screen" id="landingScreen">
                     <div class="hero-illustration">
                         <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -129,6 +133,15 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => { updateUILanguage(); }, 100);
+            
+            const savedMessages = loadMessagesFromLocalStorage();
+            if (savedMessages.length > 0) {
+                switchToChatMode();
+                fadeFeatureCards();
+                savedMessages.forEach(msg => {
+                    addMessage(msg.content, msg.role === 'user');
+                });
+            }
         });
 
         const chatMessages = document.getElementById('chatMessages');
@@ -140,6 +153,7 @@
         const chatInputContainer = document.getElementById('chatInputContainer');
         const stopButton = document.getElementById('stopButton');
         const languageToggle = document.getElementById('languageToggle');
+        const clearButton = document.getElementById('clearButton');
         const hamburgerMenu = document.getElementById('hamburgerMenu');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
         const sidebar = document.querySelector('.sidebar');
@@ -182,7 +196,8 @@
                 error429: 'Cok fazla istek, lutfen 1 dakika bekleyin',
                 error500: 'Sunucu hatasi olustu, lutfen tekrar deneyin',
                 error503: 'Servis gecici olarak kullanilamiyor, lutfen bekleyin',
-                errorDefault: 'Bir hata olustu, lutfen tekrar deneyin'
+                errorDefault: 'Bir hata olustu, lutfen tekrar deneyin',
+                clear: 'Temizle'
             },
             en: {
                 landingTitle: 'Hey!',
@@ -210,7 +225,8 @@
                 error429: 'Too many requests, please wait 1 minute',
                 error500: 'Server error occurred, please try again',
                 error503: 'Service temporarily unavailable, please wait',
-                errorDefault: 'An error occurred, please try again'
+                errorDefault: 'An error occurred, please try again',
+                clear: 'Clear'
             }
         };
 
@@ -231,6 +247,8 @@
             if (chatInput) chatInput.placeholder = t('chatPlaceholder');
             const stopText = document.getElementById('stopText');
             if (stopText) stopText.textContent = t('stop');
+            const clearText = document.getElementById('clearText');
+            if (clearText) clearText.textContent = t('clear');
             for (let i = 1; i <= 3; i++) {
                 const title = document.getElementById('featTitle' + i);
                 const desc = document.getElementById('featDesc' + i);
@@ -279,6 +297,10 @@
             setLanguage(currentLanguage === 'tr' ? 'en' : 'tr');
         });
 
+        clearButton.addEventListener('click', () => {
+            clearChat();
+        });
+
         hamburgerMenu.addEventListener('click', () => {
             sidebar.classList.toggle('open');
             sidebarOverlay.classList.toggle('open');
@@ -296,6 +318,20 @@
         function trimMessages() {
             if (messages.length > MAX_MESSAGES) messages = messages.slice(messages.length - MAX_MESSAGES);
         }
+        
+        function saveMessagesToLocalStorage() {
+            localStorage.setItem('etwin_messages', JSON.stringify(messages));
+        }
+        
+        function loadMessagesFromLocalStorage() {
+            const saved = localStorage.getItem('etwin_messages');
+            if (saved) {
+                messages = JSON.parse(saved);
+                return messages;
+            }
+            return [];
+        }
+        
         function isUserAtBottom() {
             return chatMessages.scrollHeight - chatMessages.scrollTop - chatMessages.clientHeight < 100;
         }
@@ -455,6 +491,17 @@
             messages = [];
             showFeatureCards();
         }
+        
+        function clearChat() {
+            localStorage.removeItem('etwin_messages');
+            messages = [];
+            chatMessages.innerHTML = '';
+            isChatMode = false;
+            landingScreen.classList.remove('hidden');
+            chatMessages.classList.remove('visible');
+            chatInputContainer.classList.remove('visible');
+            showFeatureCards();
+        }
 
         function fadeFeatureCards() { featureButtons.forEach(b => b.classList.add('faded')); }
         function showFeatureCards() { featureButtons.forEach(b => b.classList.remove('faded')); }
@@ -466,6 +513,7 @@
             fadeFeatureCards();
             messages.push({ role: 'user', content: message });
             trimMessages();
+            saveMessagesToLocalStorage();
             addMessage(message, true);
             inputElement.value = '';
             inputElement.style.height = 'auto';
@@ -496,6 +544,7 @@
                 sendButton.style.display = '';
                 messages.push({ role: 'assistant', content: data.response });
                 trimMessages();
+                saveMessagesToLocalStorage();
                 typeMessage(data.response);
             } catch (error) {
                 hideTypingIndicator();
