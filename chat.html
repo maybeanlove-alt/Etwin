@@ -24,13 +24,15 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="bg-blob bg-blob-1"></div>
-    <div class="bg-blob bg-blob-2"></div>
-    <div class="bg-blob bg-blob-3"></div>
+    <!-- Three.js 3D DNA Background -->
+    <canvas class="webgl"></canvas>
     <div class="app-container">
         <div class="sidebar">
             <div class="sidebar-logo">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M24 0H16V12.0632C15.9663 14.2434 14.1885 16 12.0005 16H0V24H8.68629C10.808 24 12.8429 23.1571 14.3431 21.6569L21.6569 14.3431C23.1571 12.8429 24 10.808 24 8.68629V0Z" fill="#00FF00"></path>
+                    <path d="M16 40H24V27.9368C24.0337 25.7566 25.8115 24 27.9995 24H40V16H31.3137C29.192 16 27.1571 16.8429 25.6569 18.3431L18.3431 25.6569C16.8429 27.1571 16 29.192 16 31.3137V40Z" fill="#00FF00"></path>
+                </svg>
             </div>
             <div class="sidebar-menu">
                 <button class="sidebar-item active" id="sidebarNewChat">
@@ -65,27 +67,6 @@
                     <span class="lang-en">EN</span>
                 </button>
                 <div class="landing-screen" id="landingScreen">
-                    <div class="hero-illustration">
-                        <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path class="dna-strand" d="M60 20 C60 20, 140 60, 60 100 C60 100, 140 140, 60 180" stroke="url(#grad1)" stroke-width="3" fill="none" stroke-linecap="round"/>
-                            <path class="dna-strand" d="M140 20 C140 20, 60 60, 140 100 C140 100, 60 140, 140 180" stroke="url(#grad2)" stroke-width="3" fill="none" stroke-linecap="round"/>
-                            <line class="dna-base" x1="65" y1="35" x2="135" y2="35" stroke="#0d9488" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
-                            <line class="dna-base" x1="72" y1="50" x2="128" y2="50" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
-                            <line class="dna-base" x1="78" y1="65" x2="122" y2="65" stroke="#0d9488" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
-                            <line class="dna-base" x1="72" y1="80" x2="128" y2="80" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
-                            <line class="dna-base" x1="65" y1="95" x2="135" y2="95" stroke="#0d9488" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
-                            <line class="dna-base" x1="72" y1="110" x2="128" y2="110" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
-                            <line class="dna-base" x1="78" y1="125" x2="122" y2="125" stroke="#0d9488" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
-                            <line class="dna-base" x1="72" y1="140" x2="128" y2="140" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
-                            <line class="dna-base" x1="65" y1="155" x2="135" y2="155" stroke="#0d9488" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
-                            <circle cx="100" cy="100" r="70" fill="url(#cellGrad)" opacity="0.3"/>
-                            <defs>
-                                <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#0d9488"/><stop offset="100%" stop-color="#3b82f6"/></linearGradient>
-                                <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#14b8a6"/></linearGradient>
-                                <radialGradient id="cellGrad" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#0d9488" stop-opacity="0.4"/><stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/></radialGradient>
-                            </defs>
-                        </svg>
-                    </div>
                     <div class="hero-heading">
                         <h1 class="hero-title" id="landingTitle"></h1>
                         <p class="hero-subtitle" id="landingDescription"></p>
@@ -154,18 +135,7 @@
             loadSessionsFromLocalStorage();
             renderSessionList();
             
-            if (!currentSessionId || Object.keys(sessions).length === 0) {
-                createNewSession();
-            } else {
-                if (sessions[currentSessionId] && sessions[currentSessionId].messages.length > 0) {
-                    messages = sessions[currentSessionId].messages;
-                    switchToChatMode();
-                    fadeFeatureCards();
-                    messages.forEach(msg => {
-                        addMessage(msg.content, msg.role === 'user');
-                    });
-                }
-            }
+            createNewSession();
         });
 
         const chatMessages = document.getElementById('chatMessages');
@@ -503,10 +473,6 @@
             });
         }
         
-        function isUserAtBottom() {
-            return chatMessages.scrollHeight - chatMessages.scrollTop - chatMessages.clientHeight < 100;
-        }
-
         function showError(msg) {
             const md = document.createElement('div');
             md.className = 'message error';
@@ -514,16 +480,14 @@
             cd.innerHTML = '<span class="error-icon">⚠</span> ' + msg;
             const td = document.createElement('div'); td.className = 'message-timestamp'; td.textContent = getTimestamp();
             md.appendChild(cd); md.appendChild(td);
-            const ab = isUserAtBottom();
             chatMessages.appendChild(md);
-            if (ab) scrollToBottom();
         }
 
         function getErrorMessage(st) {
             const k = 'error' + st;
             return translations[currentLanguage][k] ? t(k) : t('errorDefault');
         }
-        function scrollToBottom() { chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' }); }
+
         function getTimestamp() {
             const n = new Date();
             return n.getHours().toString().padStart(2,'0') + ':' + n.getMinutes().toString().padStart(2,'0');
@@ -560,9 +524,7 @@
                 cb.addEventListener('click', e => { e.stopPropagation(); copyToClipboard(text, cb); });
                 md.appendChild(cb);
             }
-            const ab = isUserAtBottom();
             chatMessages.appendChild(md);
-            if (ab) scrollToBottom();
         }
 
         function copyToClipboard(text, btn) {
@@ -580,9 +542,7 @@
             td.className = 'typing-indicator';
             td.id = 'typingIndicator';
             td.innerHTML = '<span class="typing-indicator-text">' + t('thinking') + '</span>';
-            const ab = isUserAtBottom();
             chatMessages.appendChild(td);
-            if (ab) scrollToBottom();
             stopButton.classList.add('visible');
         }
 
@@ -611,7 +571,7 @@
             chatMessages.appendChild(md);
             stopButton.classList.add('visible');
             let idx = 0;
-            const speed = 12;
+            const speed = 0.1;
             function type() {
                 if (!isTyping) { cursor.remove(); return; }
                 if (idx < text.length) {
@@ -624,7 +584,6 @@
                     cursor.remove();
                     cd.innerHTML = sanitizeHTML(marked.parse(text));
                     stopButton.classList.remove('visible');
-                    if (isUserAtBottom()) scrollToBottom();
                 }
             }
             type();
@@ -868,7 +827,6 @@ hedefleyen yenilikçi bir öğrenci projesidir.
             copyButton.addEventListener('click', e => { e.stopPropagation(); copyToClipboard(aboutHTML.replace(/<[^>]*>/g, ''), copyButton); });
             messageDiv.appendChild(copyButton);
             chatMessages.appendChild(messageDiv);
-            scrollToBottom();
         }
         sidebarItems[0].addEventListener('click', e => {
             e.stopPropagation();
@@ -891,6 +849,139 @@ hedefleyen yenilikçi bir öğrenci projesidir.
             navigator.serviceWorker.register('/sw.js').then(() => console.log('Service Worker registered')).catch(err => console.log('Service Worker registration failed:', err));
         }
         
+    </script>
+    <!-- Three.js 3D DNA Animation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Constants - Larger DNA filling the page
+        const dnaHeight = 150;
+        const radiusEdges = 8;
+        const variationAngle = 0.12;
+        const unionGap = 4;
+        const edgeSize = 0.4;
+        const verticalSeparation = edgeSize * 1.1;
+        const DNA = new THREE.Group();
+
+        // Canvas
+        const canvas = document.querySelector("canvas.webgl");
+
+        // Scene
+        const scene = new THREE.Scene();
+
+        // Materials with site theme colors
+        const material1 = new THREE.MeshBasicMaterial({ color: 0x10b981 }); // Primary green
+        const material2 = new THREE.MeshBasicMaterial({ color: 0x059669 }); // Darker green
+        const bladeMaterial1 = new THREE.MeshBasicMaterial({ color: 0x10b981, transparent: true, opacity: 0.7 });
+        const bladeMaterial2 = new THREE.MeshBasicMaterial({ color: 0x34d399, transparent: true, opacity: 0.7 });
+
+        // Objects
+        const createDNAFragment = (hasBlade, index) => {
+            const dnaFragment = new THREE.Group();
+            const firstEdge = new THREE.Mesh(
+                new THREE.BoxGeometry(edgeSize, edgeSize, edgeSize),
+                material1
+            );
+            const secondEdge = new THREE.Mesh(
+                new THREE.BoxGeometry(edgeSize, edgeSize, edgeSize),
+                material2
+            );
+            firstEdge.position.x = radiusEdges * Math.sin(index * variationAngle);
+            firstEdge.position.z = radiusEdges * Math.cos(index * variationAngle);
+            firstEdge.position.y = verticalSeparation * index - (dnaHeight * verticalSeparation) / 2;
+            secondEdge.position.x = -radiusEdges * Math.sin(index * variationAngle);
+            secondEdge.position.z = -radiusEdges * Math.cos(index * variationAngle);
+            secondEdge.position.y = verticalSeparation * index - (dnaHeight * verticalSeparation) / 2;
+
+            dnaFragment.add(firstEdge);
+            dnaFragment.add(secondEdge);
+
+            if (hasBlade) {
+                const blade = new THREE.Group();
+                const firstBlade = new THREE.Mesh(
+                    new THREE.BoxGeometry(edgeSize * 0.5, edgeSize * 0.5, radiusEdges * 0.8),
+                    bladeMaterial1
+                );
+
+                firstBlade.position.y = verticalSeparation * index - (dnaHeight * verticalSeparation) / 2;
+                firstBlade.position.z = radiusEdges * 0.4;
+
+                const secondBlade = new THREE.Mesh(
+                    new THREE.BoxGeometry(edgeSize * 0.5, edgeSize * 0.5, radiusEdges * 0.8),
+                    bladeMaterial2
+                );
+
+                secondBlade.position.y = verticalSeparation * index - (dnaHeight * verticalSeparation) / 2;
+                secondBlade.position.z = -radiusEdges * 0.4;
+
+                blade.add(firstBlade);
+                blade.add(secondBlade);
+
+                blade.rotateY(index * variationAngle);
+
+                dnaFragment.add(blade);
+            }
+
+            DNA.add(dnaFragment);
+        };
+
+        for (let i = 0; i < dnaHeight; i++) {
+            createDNAFragment(i % unionGap == 0, i);
+        }
+
+        scene.add(DNA);
+
+        // Sizes
+        const sizes = {
+            width: window.innerWidth,
+            height: window.innerHeight
+        };
+
+        // Camera - Wider view to see full DNA
+        const camera = new THREE.PerspectiveCamera(60, sizes.width / sizes.height);
+        camera.position.z = 45;
+        camera.position.y = 8;
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+        scene.add(camera);
+
+        // Renderer
+        const renderer = new THREE.WebGLRenderer({
+            alpha: true,
+            canvas: canvas,
+            antialias: true
+        });
+        renderer.setSize(sizes.width, sizes.height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.render(scene, camera);
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            sizes.width = window.innerWidth;
+            sizes.height = window.innerHeight;
+            camera.aspect = sizes.width / sizes.height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(sizes.width, sizes.height);
+        });
+
+        // Animation
+        let time = Date.now();
+
+        const draw = () => {
+            const currentTime = Date.now();
+            const deltaTime = currentTime - time;
+            time = currentTime;
+            
+            // Very slow rotation
+            DNA.rotateY(deltaTime * 0.0003);
+            DNA.rotateX(deltaTime * 0.0001);
+            
+            // Left-right movement
+            DNA.position.x = Math.sin(currentTime * 0.0003) * 3;
+            
+            renderer.render(scene, camera);
+            window.requestAnimationFrame(draw);
+        };
+
+        draw();
     </script>
 </body>
 </html>
